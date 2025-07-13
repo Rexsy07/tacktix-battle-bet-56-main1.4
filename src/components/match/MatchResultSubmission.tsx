@@ -42,11 +42,33 @@ const MatchResultSubmission = ({
   const uploadFiles = async () => {
     const evidenceUrls: string[] = [];
     
-    // For now, we'll use placeholder URLs since storage might not be configured
     for (const file of evidenceFiles) {
-      // Create a placeholder URL that represents the file
-      const placeholderUrl = `https://via.placeholder.com/400x300.png?text=${encodeURIComponent(file.name)}`;
-      evidenceUrls.push(placeholderUrl);
+      try {
+        // Generate a unique filename
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `match-evidence/${matchId}/${fileName}`;
+        
+        // Upload file to Supabase storage
+        const { data, error } = await supabase.storage
+          .from('match-evidence')
+          .upload(filePath, file);
+        
+        if (error) {
+          console.error('Upload error:', error);
+          throw new Error(`Failed to upload ${file.name}: ${error.message}`);
+        }
+        
+        // Get the public URL
+        const { data: urlData } = supabase.storage
+          .from('match-evidence')
+          .getPublicUrl(filePath);
+        
+        evidenceUrls.push(urlData.publicUrl);
+      } catch (error: any) {
+        console.error('File upload error:', error);
+        throw new Error(`Failed to upload ${file.name}: ${error.message}`);
+      }
     }
     
     return evidenceUrls;

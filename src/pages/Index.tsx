@@ -22,44 +22,56 @@ const Index = () => {
   
   useEffect(() => {
     const fetchHomeData = async () => {
-      setLoading(true);
-      
-      // Fetch featured matches
-      const featuredResult = await getFeaturedMatches();
-      if (featuredResult.success) {
-        setFeaturedMatches(featuredResult.data);
+      try {
+        setLoading(true);
+        
+        // Fetch featured matches
+        const featuredResult = await getFeaturedMatches();
+        if (featuredResult.success) {
+          setFeaturedMatches(featuredResult.data);
+        }
+        
+        // Fetch live matches
+        const liveResult = await getLiveMatches();
+        if (liveResult.success) {
+          setLiveMatches(liveResult.data);
+        }
+        
+        // Fetch leaderboard data
+        const leaderboardResult = await getLeaderboardData();
+        if (leaderboardResult.success) {
+          setLeaderboardData(leaderboardResult.data);
+        }
+        
+        // Fetch game modes
+        const modesResult = await getGameModes();
+        if (modesResult.success) {
+          setGameModes(modesResult.data);
+        }
+      } catch (error) {
+        console.error('Error fetching home data:', error);
+      } finally {
+        setLoading(false);
       }
-      
-      // Fetch live matches
-      const liveResult = await getLiveMatches();
-      if (liveResult.success) {
-        setLiveMatches(liveResult.data);
-      }
-      
-      // Fetch leaderboard data
-      const leaderboardResult = await getLeaderboardData();
-      if (leaderboardResult.success) {
-        setLeaderboardData(leaderboardResult.data);
-      }
-      
-      // Fetch game modes
-      const modesResult = await getGameModes();
-      if (modesResult.success) {
-        setGameModes(modesResult.data);
-      }
-      
-      setLoading(false);
     };
     
     fetchHomeData();
     
-    // Set up a refresh interval (every 30 seconds)
-    const interval = setInterval(fetchHomeData, 30000);
+    // Only set up refresh interval if user is authenticated and on desktop
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const shouldRefresh = user && !isMobile;
+    
+    let interval: NodeJS.Timeout | null = null;
+    if (shouldRefresh) {
+      interval = setInterval(fetchHomeData, 60000); // Refresh every minute instead of 30 seconds
+    }
     
     return () => {
-      clearInterval(interval);
+      if (interval) {
+        clearInterval(interval);
+      }
     };
-  }, []);
+  }, [user]);
 
   return (
     <Layout fullWidth>

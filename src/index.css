@@ -57,11 +57,18 @@
   }
 
   .glass-navbar {
-    background: rgba(15, 23, 42, 0.85);
+    background: rgba(15, 23, 42, 0.95);
     border-bottom: 1px solid rgba(59, 130, 246, 0.1);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Fallback for Android */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Only apply backdrop-filter on supported browsers */
+  @supports (backdrop-filter: blur(12px)) {
+    .glass-navbar {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
   }
 
   .text-gradient {
@@ -73,7 +80,17 @@
 }
 
 .glass-card {
-  @apply bg-tacktix-dark/50 backdrop-blur-sm border-white/5 shadow-md;
+  @apply bg-tacktix-dark/80 border-white/5 shadow-md;
+  /* Fallback for Android */
+  background: rgba(15, 23, 42, 0.8);
+}
+
+/* Only apply backdrop-filter on supported browsers */
+@supports (backdrop-filter: blur(12px)) {
+  .glass-card {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
 }
 
 .tacktix-gradient {
@@ -81,10 +98,28 @@
 }
 
 .glass {
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(15, 23, 42, 0.95);
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+/* Only apply backdrop-filter on supported browsers */
+@supports (backdrop-filter: blur(12px)) {
+  .glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+/* Fix for Android scrolling issues */
+html, body {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+}
+
+/* Prevent white screen on Android */
+* {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
